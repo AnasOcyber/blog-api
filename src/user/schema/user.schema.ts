@@ -6,7 +6,7 @@ export type UserDocument = HydratedDocument<User>;
 
 @Schema()
 export class User {
-  @Prop()
+  @Prop({ required: true })
   username: string;
 
   @Prop()
@@ -15,8 +15,8 @@ export class User {
   @Prop()
   createdAt: Date;
 
-  @Prop({ type: mongoose.Schema.ObjectId, ref: 'Post' })
-  posts: Post[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Post' })
+  posts: [Post];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

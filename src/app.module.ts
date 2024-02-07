@@ -4,6 +4,10 @@ import { PostModule } from './post/post.module';
 import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [PostModule, MongooseModule.forRoot('mongodb://localhost/nest'), UserModule],
+  imports: [
+    MongooseModule.forRoot('mongodb://localhost/nest'),
+    PostModule,
+    UserModule,
+  ],
 })
 export class AppModule {}
