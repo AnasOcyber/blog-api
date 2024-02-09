@@ -8,32 +8,36 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-  async get(id: string) {
+  async getAll(): Promise<User[]> {
+    return await this.userModel.find();
+  }
+
+  async get(id: string): Promise<User> {
     return await this.userModel.findById(id);
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     return await this.userModel.create({
       ...createUserDto,
       createdAt: new Date(),
     });
   }
 
-  async update(id: string, createUserDto: CreateUserDto) {
+  async update(id: string, createUserDto: CreateUserDto): Promise<User> {
     return await this.userModel.findByIdAndUpdate(id, createUserDto);
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<User> {
     return await this.userModel.findByIdAndDelete(id);
   }
 
-  addPosts(userId: string, postId: string) {
-    return this.userModel.findByIdAndUpdate(
-      userId,
-      {
-        $addToSet: { posts: postId },
-      },
-      { new: true },
-    );
-  }
+  // addPosts(userId: string, postId: string) {
+  //   return this.userModel.findByIdAndUpdate(
+  //     userId,
+  //     {
+  //       $addToSet: { posts: postId },
+  //     },
+  //     { new: true },
+  //   );
+  // }
 }

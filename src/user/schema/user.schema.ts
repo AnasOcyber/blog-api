@@ -12,11 +12,11 @@ export class User {
   @Prop()
   email: string;
 
-  @Prop()
+  @Prop({ default: Date.now() })
   createdAt: Date;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Post' })
-  posts: [Post];
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: Post.name }] })
+  posts: Post[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -1,12 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post } from './schema/post.schema';
 import { Model } from 'mongoose';
 import { CreatePostDto } from './dto/create-post.dto';
+import { User } from 'src/user/schema/user.schema';
 
 @Injectable()
 export class PostService {
-  constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
+  constructor(
+    @InjectModel(Post.name) private postModel: Model<Post>,
+    @InjectModel(User.name) private userModel: Model<User>,
+  ) {}
 
   async findAll(): Promise<Post[]> {
     const posts = await this.postModel.find();
@@ -21,17 +25,19 @@ export class PostService {
     return post;
   }
 
-  async create(createPostDto: CreatePostDto): Promise<Post> {
-    return await this.postModel.create({
-      ...createPostDto,
-      createdAt: new Date().toDateString(),
-      updatedAt: new Date().toDateString(),
-    });
+  async create({ userId, ...postDto }: CreatePostDto): Promise<Post> {
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    const post = await this.postModel.create(postDto);
+    await user.updateOne({ $push: { posts: post } });
+
+    return post;
   }
 
-  async update(id: string, createPostDto: CreatePostDto): Promise<Post> {
+  async update(id: string, post: CreatePostDto): Promise<Post> {
     try {
-      return await this.postModel.findByIdAndUpdate(id, createPostDto, {
+      return await this.postModel.findByIdAndUpdate(id, post, {
         new: true,
       });
     } catch (error) {
@@ -44,5 +50,15 @@ export class PostService {
     if (!post) throw new NotFoundException(`The post with ${id} not found`);
 
     return 'Deleted successfully';
+  }
+
+  async addComments(postId: string, commentId: string) {
+    return this.postModel.findByIdAndUpdate(
+      postId,
+      {
+        $addToSet: { comments: commentId },
+      },
+      { new: true },
+    );
   }
 }
