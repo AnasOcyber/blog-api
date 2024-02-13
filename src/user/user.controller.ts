@@ -38,9 +38,4 @@ export class UserController {
   deleteUser(@Param('id') id: string) {
     return this.userService.delete(id);
   }
-
-  // @Patch('/:userId/post/:postId')
-  // addPosts(@Param('userId') userId: string, @Param('postId') postId: string) {
-  //   return this.userService.addPosts(userId, postId);
-  // }
 }
